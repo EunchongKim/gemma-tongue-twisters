@@ -1,202 +1,139 @@
 ---
-base_model: google/gemma-2-2b-it
-library_name: peft
+license: gemma
+language:
+- en
+base_model:
+- google/gemma-2-2b-it
+pipeline_tag: text-generation
 ---
 
-# Model Card for Model ID
+# **Model Demo**
 
-<!-- Provide a quick summary of what the model is/does. -->
+You can try the **Tongue Twister Generator** in the [Hugging Face Space - Tongue Twister Generator with TTS](https://huggingface.co/spaces/ec-kim/gemma2-tongue-twister-generator).
 
+<br>
 
+# **Model Card: gemma2-tongue-twister-generator**
 
-## Model Details
+## **Model Details**
 
-### Model Description
+- **Model Name**: gemma2-tongue-twister-generator
+- **Model Type**: Causal Language Model (Fine-tuned with LoRA)
+- **Architecture**: Gemma 2 2B (based on Transformer architecture)
+- **Base Model**: `google/gemma-2-2b-it`
+- **Training Method**: Fine-tuned using Low-Rank Adaptation (LoRA)
+- **Languages**: English
+- **License**: Gemma License
 
-<!-- Provide a longer summary of what this model is. -->
+## **Model Description**
 
+The **gemma2-tongue-twister-generator** is a fine-tuned version of the **Gemma 2 2B** model. It is specifically trained to generate creative and challenging tongue twisters based on given keywords or prompts. The model can create intricate wordplays with rhythmic patterns, making it ideal for educational and entertainment purposes, such as helping individuals practice speech articulation and fluency.
 
+### **Use Cases**
 
-- **Developed by:** [More Information Needed]
-- **Funded by [optional]:** [More Information Needed]
-- **Shared by [optional]:** [More Information Needed]
-- **Model type:** [More Information Needed]
-- **Language(s) (NLP):** [More Information Needed]
-- **License:** [More Information Needed]
-- **Finetuned from model [optional]:** [More Information Needed]
+- **Tongue Twister Generation**: Generate custom tongue twisters based on a set of provided keywords.
+- **Speech Practice**: Enhance speaking and articulation skills by practicing with challenging wordplay.
+- **Entertainment**: Generate engaging and fun tongue twisters for social games or language challenges.
 
-### Model Sources [optional]
+## **Training Procedure**
 
-<!-- Provide the basic links for the model. -->
+- **Dataset**: The model was fine-tuned on a dataset of 1,900 English tongue twisters, where each example contains a prompt (keywords or questions) and an answer (a tongue twister). The dataset is based on examples found in the paper "TongueTwister Games: A New Benchmark and Dataset for Word Play Generation" published at ACL 2023.
+  - **Example Prompt**: `"Generate tongue twisters about key words: sea seashell"`
+  - **Example Answer**: `"She sells seashells by the seashore."`
+  
+- **Training Method**: The model was fine-tuned using **LoRA (Low-Rank Adaptation)** without quantization to maintain high precision and model quality.
+- **Parameters**:
+  - **Learning Rate**: 3e-5
+  - **Epochs**: 3
+  - **Batch Size**: 8
+  - **Gradient Accumulation**: 4 steps
+  - **Scheduler**: Cosine Learning Rate Scheduler
+  - **Warmup Steps**: 100
+  - **Evaluation**: Early stopping was based on validation performance.
 
-- **Repository:** [More Information Needed]
-- **Paper [optional]:** [More Information Needed]
-- **Demo [optional]:** [More Information Needed]
+## **Model Performance**
 
-## Uses
+- **Metrics**: 
+  - **Human Evaluation**: Qualitative evaluation indicates that the model generates coherent and challenging tongue twisters based on keywords.
+  - **No Extra Keywords**: The model does not generate keywords not present in the prompt, ensuring output relevance to the given input.
 
-<!-- Address questions around how the model is intended to be used, including the foreseeable users of the model and those affected by the model. -->
+### **Limitations**
 
-### Direct Use
+- **Rhythmic Patterns**: The model may not perfectly generate complex syllable stress or rhythmic complexity in all tongue twisters, which might affect the challenge level or entertainment factor.
+- **Language**: This model is designed to work only with English tongue twisters.
 
-<!-- This section is for the model use without fine-tuning or plugging into a larger ecosystem/app. -->
+### **Potential Biases**
 
-[More Information Needed]
+The model was trained on tongue twisters, which are specific to a subset of the English language and may not capture cultural or linguistic diversity. The dataset could contain patterns reflective of Western language games, which might affect the diversity of the generated text.
 
-### Downstream Use [optional]
+## Inference Environment
 
-<!-- This section is for the model use when fine-tuned for a task, or when plugged into a larger ecosystem/app -->
+The following versions were used during the inference of the model:
 
-[More Information Needed]
+- Python: 3.10.12
+- transformers: 4.44.2
+- torch: 2.4.1+cu121
+- peft: 0.13.0
 
-### Out-of-Scope Use
+### Installation
 
-<!-- This section addresses misuse, malicious use, and uses that the model will not work well for. -->
+You can install these dependencies using the following command:
 
-[More Information Needed]
+```bash
+pip install transformers peft torch
+```
 
-## Bias, Risks, and Limitations
+## **How to Use the Model**
 
-<!-- This section is meant to convey both technical and sociotechnical limitations. -->
+You can use this model for inference using the Hugging Face `transformers` library:
 
-[More Information Needed]
+```python
+from transformers import AutoTokenizer, AutoModelForCausalLM
+from peft import PeftModel
 
-### Recommendations
+# Load the model and tokenizer
+model_name = "ec-kim/gemma2-tongue-twister-generator"
+base_model = AutoModelForCausalLM.from_pretrained("google/gemma-2-2b-it")
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = PeftModel.from_pretrained(base_model, model_name)
 
-<!-- This section is meant to convey recommendations with respect to the bias, risk, and technical limitations. -->
+# Generate tongue twister
+question = "Generate tongue twisters about key words: cinnamon synonym"
+inputs = tokenizer(question, return_tensors="pt")
 
-Users (both direct and downstream) should be made aware of the risks, biases and limitations of the model. More information needed for further recommendations.
+outputs = model.generate(
+    inputs.input_ids,
+    max_length=100,
+    num_return_sequences=1,
+    no_repeat_ngram_size=2,
+    repetition_penalty=2.0,
+    top_k=50,
+    top_p=0.95,
+    temperature=0.7,
+    eos_token_id=tokenizer.eos_token_id,
+    do_sample=True
+)
 
-## How to Get Started with the Model
+response = tokenizer.decode(outputs[0], skip_special_tokens=True)
+print(response)
+```
 
-Use the code below to get started with the model.
+## **Sample Output**
 
-[More Information Needed]
+**Prompt**: "Generate tongue twisters about key words: weeping winnie"  
+**Output**: "Generate tongue twisters about key words: weeping winnie wore wimpier wings when she wanted to weep."
 
-## Training Details
+## **Intended Use**
 
-### Training Data
+- **Primary Use Case**: Generating tongue twisters for entertainment, speech practice, or educational purposes.
+- **Use with Caution**: Not intended for generating factual or coherent long-form text. The model excels in generating short, playful text but may not produce factual information.
 
-<!-- This should link to a Dataset Card, perhaps with a short stub of information on what the training data is all about as well as documentation related to data pre-processing or additional filtering. -->
+## **Future Work**
 
-[More Information Needed]
+- Extend the dataset with more diverse and creative tongue twisters.
+- Explore multi-lingual training for generating tongue twisters in other languages.
+- Fine-tune on datasets with specific constraints like syllable stress and rhythmic complexity.
 
-### Training Procedure
+## **Contributions**
 
-<!-- This relates heavily to the Technical Specifications. Content here should link to that section when it is relevant to the training procedure. -->
-
-#### Preprocessing [optional]
-
-[More Information Needed]
-
-
-#### Training Hyperparameters
-
-- **Training regime:** [More Information Needed] <!--fp32, fp16 mixed precision, bf16 mixed precision, bf16 non-mixed precision, fp16 non-mixed precision, fp8 mixed precision -->
-
-#### Speeds, Sizes, Times [optional]
-
-<!-- This section provides information about throughput, start/end time, checkpoint size if relevant, etc. -->
-
-[More Information Needed]
-
-## Evaluation
-
-<!-- This section describes the evaluation protocols and provides the results. -->
-
-### Testing Data, Factors & Metrics
-
-#### Testing Data
-
-<!-- This should link to a Dataset Card if possible. -->
-
-[More Information Needed]
-
-#### Factors
-
-<!-- These are the things the evaluation is disaggregating by, e.g., subpopulations or domains. -->
-
-[More Information Needed]
-
-#### Metrics
-
-<!-- These are the evaluation metrics being used, ideally with a description of why. -->
-
-[More Information Needed]
-
-### Results
-
-[More Information Needed]
-
-#### Summary
-
-
-
-## Model Examination [optional]
-
-<!-- Relevant interpretability work for the model goes here -->
-
-[More Information Needed]
-
-## Environmental Impact
-
-<!-- Total emissions (in grams of CO2eq) and additional considerations, such as electricity usage, go here. Edit the suggested text below accordingly -->
-
-Carbon emissions can be estimated using the [Machine Learning Impact calculator](https://mlco2.github.io/impact#compute) presented in [Lacoste et al. (2019)](https://arxiv.org/abs/1910.09700).
-
-- **Hardware Type:** [More Information Needed]
-- **Hours used:** [More Information Needed]
-- **Cloud Provider:** [More Information Needed]
-- **Compute Region:** [More Information Needed]
-- **Carbon Emitted:** [More Information Needed]
-
-## Technical Specifications [optional]
-
-### Model Architecture and Objective
-
-[More Information Needed]
-
-### Compute Infrastructure
-
-[More Information Needed]
-
-#### Hardware
-
-[More Information Needed]
-
-#### Software
-
-[More Information Needed]
-
-## Citation [optional]
-
-<!-- If there is a paper or blog post introducing the model, the APA and Bibtex information for that should go in this section. -->
-
-**BibTeX:**
-
-[More Information Needed]
-
-**APA:**
-
-[More Information Needed]
-
-## Glossary [optional]
-
-<!-- If relevant, include terms and calculations in this section that can help readers understand the model or model card. -->
-
-[More Information Needed]
-
-## More Information [optional]
-
-[More Information Needed]
-
-## Model Card Authors [optional]
-
-[More Information Needed]
-
-## Model Card Contact
-
-[More Information Needed]
-### Framework versions
-
-- PEFT 0.12.0
+This model was fine-tuned by using the Hugging Face `transformers` and `peft` libraries. The training dataset is based on the paper ["TongueTwister Games: A New Benchmark and Dataset for Word Play Generation"](https://aclanthology.org/2023.acl-short.51.pdf) from ACL 2023. For any issues, please contact [here](https://github.com/EunchongKim)
