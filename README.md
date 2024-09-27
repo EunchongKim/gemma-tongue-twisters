@@ -116,6 +116,23 @@ The model was trained on tongue twisters, which are specific to a subset of the 
 
 ---
 
+## Inference Environment
+
+The following versions were used during the inference of the model:
+
+- Python: 3.10.12
+- transformers: 4.44.2
+- torch: 2.4.1+cu121
+- peft: 0.13.0
+
+### Installation
+
+You can install these dependencies using the following command:
+
+```bash
+pip install transformers peft torch
+```
+
 ## **How to Use the Model**
 
 You can use this model for inference using the Hugging Face `transformers` library:
