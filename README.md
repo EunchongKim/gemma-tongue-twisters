@@ -168,7 +168,7 @@ After fine-tuning the model with specific tongue twister data, there were notabl
 
 #### **Base Model (gemma-2-2b-it) Output**:
 
-For details on the basic model’s output, please refer to the [basic model inference results](#basic-gemma2-inference-results).
+For details on the basic model’s output, please refer to the [basic model inference results](#basic-gemma-2-2b-it-model-inference).
 
 1. As seen in the base model's response to "weeping winnie," extra, irrelevant keywords were often introduced.
 
